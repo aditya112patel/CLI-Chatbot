@@ -35,7 +35,8 @@ python cli_chat.py
 ```
 
 **Note**
-**feedback.txt will contain your review and rating.**
 
-**chat_history.txt will save all conversations you had.**
+1. **feedback.txt will contain your review and rating.**
+
+2. **chat_history.txt will save all conversations you had.**
 
