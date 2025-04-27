@@ -1,0 +1,6 @@
+# .env file
+.env
+
+#temporary files
+chat_history.txt
+feedback.txt
