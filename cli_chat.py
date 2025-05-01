@@ -8,7 +8,7 @@ API_KEY = os.getenv("API_KEY")
 genai.configure(api_key=API_KEY)
 
 chat_model = genai.GenerativeModel(
-    model_name="gemini-1.5-pro",
+    model_name="gemini-1.5-flash",
     tools=[
         {
             "function_declarations": [
@@ -79,39 +79,23 @@ def chat_session():
         conversation_log.append(f"You: {user_message}")
 
         if check_exit_intent(user_message):
+
             feedback_chat = chat_model.start_chat()
+            while True:
+                try:
+                    feedback_input = input("\nPlease leave a review and rating! ").strip()
+                    response = feedback_chat.send_message(feedback_input)
+                    if response.candidates[0].content.parts[0].function_call:
+                        feedback = response.candidates[0].content.parts[0].function_call.args
+                        write_feedback(feedback)
+                        write_chat_log(conversation_log)
+                        print("\n🙏 Thanks for your feedback! Goodbye!")
+                        return
+                    print("Please provide a valid review and a rating between 1-5!")
+                except Exception as error:
+                    print(f"⚠️ Error extracting feedback: {str(error)}")
+                    break
 
-            try:
-                feedback_chat.send_message(
-                    "Ask the user for a short review and a rating (1-5) using the collect_feedback function."
-                )
-
-                review_input = input("\nPlease share your feedback: ").strip()
-
-                while True:
-                    try:
-                        rating_input = int(input("Please rate your experience (1-5): ").strip())
-                        if 1 <= rating_input <= 5:
-                            break
-                        else:
-                            print("⚠️ Rating must be between 1 and 5.")
-                    except ValueError:
-                        print("⚠️ Please enter a valid integer between 1 and 5.")
-
-                feedback = {
-                    "review": review_input,
-                    "rating": rating_input
-                }
-
-                write_feedback(feedback)
-                write_chat_log(conversation_log)
-
-                print("\n🙏 Thanks a lot for your feedback. Goodbye!")
-                break
-
-            except Exception as error:
-                print(f"⚠️ Error gathering feedback: {str(error)}")
-                break
 
         try:
             chat = chat_model.start_chat()
