@@ -37,7 +37,6 @@ chat_model = genai.GenerativeModel(
 
 conversation_log = []
 
-
 def write_feedback(feedback):
     with open("feedback.txt", "a") as file:
         file.write(f"Review: {feedback['review']}\n")
@@ -85,15 +84,17 @@ def chat_session():
                 try:
                     feedback_input = input("\nPlease leave a review and rating! ").strip()
                     response = feedback_chat.send_message(feedback_input)
+
                     if response.candidates[0].content.parts[0].function_call:
                         feedback = response.candidates[0].content.parts[0].function_call.args
                         write_feedback(feedback)
                         write_chat_log(conversation_log)
-                        print("\n🙏 Thanks for your feedback! Goodbye!")
+                        print("\nThanks for your feedback! Goodbye!")
                         return
+                    
                     print("Please provide a valid review and a rating between 1-5!")
                 except Exception as error:
-                    print(f"⚠️ Error extracting feedback: {str(error)}")
+                    print(f"Error extracting feedback: {str(error)}")
                     break
 
 
